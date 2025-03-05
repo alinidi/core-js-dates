@@ -78,11 +78,16 @@ function getDayName(date) {
  */
 function getNextFriday(date) {
   const givenDate = new Date(date);
-  const day = givenDate.getDay();
-  const dayUntilFriday = (5 - day + 7) % 7 || 7;
+  const day = givenDate.getUTCDay();
+  const daysUntilFriday = day === 5 ? 7 : (5 - day + 7) % 7;
 
-  givenDate.setDate(givenDate.getDate() + dayUntilFriday);
-  return givenDate;
+  return new Date(
+    Date.UTC(
+      givenDate.getUTCFullYear(),
+      givenDate.getUTCMonth(),
+      givenDate.getUTCDate() + daysUntilFriday
+    )
+  );
 }
 
 /**
@@ -211,11 +216,11 @@ function getCountWeekendsInMonth(month, year) {
 function getWeekNumberByDate(date) {
   const givenDate = new Date(date);
 
-  let weekDay = givenDate.getDay();
+  let weekDay = givenDate.getUTCDay();
   if (weekDay === 0) weekDay = 7;
 
-  const startOfYear = new Date(givenDate.getFullYear(), 0, 4);
-  let startDayOfWeek = startOfYear.getDay();
+  const startOfYear = new Date(Date.UTC(givenDate.getUTCFullYear(), 0, 4));
+  let startDayOfWeek = startOfYear.getUTCDay();
   if (startDayOfWeek === 0) startDayOfWeek = 7;
 
   const diff =
@@ -244,7 +249,7 @@ function getNextFridayThe13th(date) {
   const tillYearEnds = 12 - currMonth;
 
   for (let month = currMonth; month <= tillYearEnds; month += 1) {
-    if (new Date(currYear, month, 13).getDay() === 5) {
+    if (new Date(currYear, month, 13).getUTCDay() === 5) {
       return new Date(currYear, month, 13);
     }
   }
@@ -252,7 +257,7 @@ function getNextFridayThe13th(date) {
   while (true) {
     currYear += 1;
     for (let month = 0; month < 12; month += 1) {
-      if (new Date(currYear, month, 13).getDay() === 5) {
+      if (new Date(currYear, month, 13).getUTCDay() === 5) {
         return new Date(currYear, month, 13);
       }
     }
@@ -308,9 +313,9 @@ function getQuarter(date) {
  */
 function getWorkSchedule(period, countWorkDays, countOffDays) {
   function format(date) {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
     return `${day}-${month}-${year}`;
   }
 
@@ -323,10 +328,10 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
   while (currentDate <= end) {
     for (let i = 0; i < countWorkDays && currentDate <= end; i += 1) {
       workDays.push(format(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
-    currentDate.setDate(currentDate.getDate() + countOffDays);
+    currentDate.setUTCDate(currentDate.getUTCDate() + countOffDays);
   }
 
   return workDays;
