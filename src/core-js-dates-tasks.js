@@ -254,14 +254,17 @@ function getNextFridayThe13th(date) {
     }
   }
 
-  while (true) {
+  let foundFriday13th = false;
+  while (!foundFriday13th) {
     currYear += 1;
     for (let month = 0; month < 12; month += 1) {
       if (new Date(currYear, month, 13).getDay() === 5) {
+        foundFriday13th = true;
         return new Date(currYear, month, 13);
       }
     }
   }
+  return null;
 }
 
 /**
