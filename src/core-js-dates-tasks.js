@@ -18,7 +18,7 @@
  * '04 Dec 1995 00:12:00 UTC' => 818035920000
  */
 function dateToTimestamp(date) {
-  return new Date(date).getTime();
+  return new Date(Date.parse(date)).getTime();
 }
 
 /**
@@ -215,19 +215,19 @@ function getCountWeekendsInMonth(month, year) {
  */
 function getWeekNumberByDate(date) {
   const givenDate = new Date(date);
+  const weekDay = givenDate.getUTCDay();
 
-  let weekDay = givenDate.getUTCDay();
-  if (weekDay === 0) weekDay = 7;
+  const adjustedWeekDay = weekDay === 0 ? 7 : weekDay;
 
   const startOfYear = new Date(Date.UTC(givenDate.getUTCFullYear(), 0, 4));
+
   let startDayOfWeek = startOfYear.getUTCDay();
-  if (startDayOfWeek === 0) startDayOfWeek = 7;
+  startDayOfWeek = startDayOfWeek === 0 ? 7 : startDayOfWeek;
 
   const diff =
-    Math.floor((givenDate - startOfYear) / (1000 * 60 * 60 * 24)) +
-    startDayOfWeek;
+    Math.floor((givenDate - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
 
-  return Math.ceil(diff / 7);
+  return Math.ceil((diff + (startDayOfWeek - adjustedWeekDay)) / 7);
 }
 
 /**
@@ -243,13 +243,13 @@ function getWeekNumberByDate(date) {
  */
 function getNextFridayThe13th(date) {
   const givenDate = new Date(date);
-  let currYear = givenDate.getUTCFullYear();
-  const currMonth = givenDate.getUTCMonth();
+  let currYear = givenDate.getFullYear();
+  const currMonth = givenDate.getMonth();
 
   const tillYearEnds = 12 - currMonth;
 
   for (let month = currMonth; month <= tillYearEnds; month += 1) {
-    if (new Date(currYear, month, 13).getUTCDay() === 5) {
+    if (new Date(currYear, month, 13).getDay() === 5) {
       return new Date(currYear, month, 13);
     }
   }
@@ -257,7 +257,7 @@ function getNextFridayThe13th(date) {
   while (true) {
     currYear += 1;
     for (let month = 0; month < 12; month += 1) {
-      if (new Date(currYear, month, 13).getUTCDay() === 5) {
+      if (new Date(currYear, month, 13).getDay() === 5) {
         return new Date(currYear, month, 13);
       }
     }
